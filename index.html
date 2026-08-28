@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f8f6f0">
+<title>Birthday Strands</title>
+<style>
+:root {
+  --bg:#f8f6f0; --ink:#111; --muted:#6d6a64; --rule:#d9d5cc;
+  --card:#fffefb; --select:#b9d7f5; --word:#f4cc72; --special:#98d6ac; --line:#98bfe8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink)}
+body{font-family:Arial,Helvetica,sans-serif}
+main{width:min(620px,100%);margin:0 auto;padding:18px 14px 48px}
+.topbar{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--rule);padding:4px 2px 15px;margin-bottom:20px}
+.brand{font-family:Georgia,"Times New Roman",serif;font-size:31px;font-weight:700;letter-spacing:-.03em}
+.game{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.theme-card{text-align:center;padding:4px 14px 18px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.theme{font-family:Georgia,"Times New Roman",serif;font-size:26px;line-height:1.15;font-weight:700}
+.instructions{font-size:14px;line-height:1.45;color:var(--muted);margin:9px auto 0;max-width:440px}
+.board-card{background:var(--card);border:1px solid var(--rule);border-radius:20px;padding:14px;box-shadow:0 4px 18px rgba(0,0,0,.035)}
+.progress{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);padding:1px 4px 12px}
+.board-wrap{position:relative;touch-action:none}
+#lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+#grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(9,1fr);gap:5px;user-select:none}
+.cell{appearance:none;border:0;background:transparent;aspect-ratio:1;border-radius:50%;font-size:clamp(16px,5vw,23px);font-weight:800;display:grid;place-items:center;cursor:pointer;transition:transform .12s ease,background .15s ease}
+.cell.selected{background:var(--select)}
+.cell.found{background:var(--word);animation:pop .23s ease}
+.cell.special{background:var(--special);animation:pop .23s ease}
+@keyframes pop{0%{transform:scale(.8)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
+.status{min-height:42px;text-align:center;padding:13px 6px 0;font-size:14px;color:var(--muted);line-height:1.4}
+.controls{display:flex;justify-content:center;gap:9px;margin-top:3px}
+button.ctrl{appearance:none;border:1px solid var(--rule);background:transparent;border-radius:999px;padding:9px 13px;font-weight:700;font-size:13px;cursor:pointer}
+.words{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:13px}
+.pill{font-size:11px;font-weight:800;background:#ece8df;padding:6px 9px;border-radius:999px}
+.pill.special{background:var(--special)}
+.finish{display:none;text-align:center;margin-top:20px;padding:28px 18px 25px;border-top:1px solid var(--rule)}
+.finish.show{display:block}
+.finish .small{font-size:12px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.finish h2{font-family:Georgia,"Times New Roman",serif;font-size:34px;line-height:1.1;margin:10px 0 4px}
+.finish .bags{font-family:Georgia,"Times New Roman",serif;font-size:25px;font-style:italic;margin:11px 0 0}
+.confetti{position:fixed;top:-18px;width:8px;height:14px;border-radius:2px;pointer-events:none;z-index:99;animation:fall 2.6s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(800deg);opacity:.85}}
+@media(max-width:380px){
+  main{padding-left:8px;padding-right:8px}
+  .board-card{padding:10px}
+  #grid{gap:3px}
+  .brand{font-size:28px}
+  .theme{font-size:23px}
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar">
+    <div class="brand">Strands</div>
+    <div class="game">Birthday Games</div>
+  </div>
+  <section class="theme-card">
+    <div class="eyebrow">Today’s Theme</div>
+    <div class="theme">Please put the lime in the coconut</div>
+    <div class="instructions">Connect adjacent letters — horizontal, vertical or diagonal. Find every hidden word and the special answer.</div>
+  </section>
+  <section class="board-card">
+    <div class="progress"><span>Words found</span><strong><span id="foundCount">0</span>/9</strong></div>
+    <div class="board-wrap" id="boardWrap">
+      <svg id="lines" aria-hidden="true"></svg>
+      <div id="grid">
+<button class="cell" type="button" data-r="0" data-c="0" data-letter="L">L</button>
+<button class="cell" type="button" data-r="0" data-c="1" data-letter="O">O</button>
+<button class="cell" type="button" data-r="0" data-c="2" data-letter="N">N</button>
+<button class="cell" type="button" data-r="0" data-c="3" data-letter="D">D</button>
+<button class="cell" type="button" data-r="0" data-c="4" data-letter="I">I</button>
+<button class="cell" type="button" data-r="0" data-c="5" data-letter="S">S</button>
+<button class="cell" type="button" data-r="0" data-c="6" data-letter="A">A</button>
+<button class="cell" type="button" data-r="0" data-c="7" data-letter="T">T</button>
+<button class="cell" type="button" data-r="0" data-c="8" data-letter="K">K</button>
+<button class="cell" type="button" data-r="1" data-c="0" data-letter="E">E</button>
+<button class="cell" type="button" data-r="1" data-c="1" data-letter="R">R</button>
+<button class="cell" type="button" data-r="1" data-c="2" data-letter="E">E</button>
+<button class="cell" type="button" data-r="1" data-c="3" data-letter="N">N</button>
+<button class="cell" type="button" data-r="1" data-c="4" data-letter="Z">Z</button>
+<button class="cell" type="button" data-r="1" data-c="5" data-letter="P">P</button>
+<button class="cell" type="button" data-r="1" data-c="6" data-letter="R">R</button>
+<button class="cell" type="button" data-r="1" data-c="7" data-letter="O">O</button>
+<button class="cell" type="button" data-r="1" data-c="8" data-letter="O">O</button>
+<button class="cell" type="button" data-r="2" data-c="0" data-letter="G">G</button>
+<button class="cell" type="button" data-r="2" data-c="1" data-letter="U">U</button>
+<button class="cell" type="button" data-r="2" data-c="2" data-letter="T">T</button>
+<button class="cell" type="button" data-r="2" data-c="3" data-letter="I">I</button>
+<button class="cell" type="button" data-r="2" data-c="4" data-letter="W">W</button>
+<button class="cell" type="button" data-r="2" data-c="5" data-letter="T">T</button>
+<button class="cell" type="button" data-r="2" data-c="6" data-letter="E">E</button>
+<button class="cell" type="button" data-r="2" data-c="7" data-letter="B">B</button>
+<button class="cell" type="button" data-r="2" data-c="8" data-letter="E">E</button>
+<button class="cell" type="button" data-r="3" data-c="0" data-letter="M">M</button>
+<button class="cell" type="button" data-r="3" data-c="1" data-letter="A">A</button>
+<button class="cell" type="button" data-r="3" data-c="2" data-letter="E">E</button>
+<button class="cell" type="button" data-r="3" data-c="3" data-letter="E">E</button>
+<button class="cell" type="button" data-r="3" data-c="4" data-letter="L">L</button>
+<button class="cell" type="button" data-r="3" data-c="5" data-letter="B">B</button>
+<button class="cell" type="button" data-r="3" data-c="6" data-letter="A">A</button>
+<button class="cell" type="button" data-r="3" data-c="7" data-letter="I">I</button>
+<button class="cell" type="button" data-r="3" data-c="8" data-letter="F">F</button>
+<button class="cell" type="button" data-r="4" data-c="0" data-letter="V">V</button>
+<button class="cell" type="button" data-r="4" data-c="1" data-letter="E">E</button>
+<button class="cell" type="button" data-r="4" data-c="2" data-letter="L">L</button>
+<button class="cell" type="button" data-r="4" data-c="3" data-letter="H">H</button>
+<button class="cell" type="button" data-r="4" data-c="4" data-letter="E">E</button>
+<button class="cell" type="button" data-r="4" data-c="5" data-letter="L">L</button>
+<button class="cell" type="button" data-r="4" data-c="6" data-letter="U">U</button>
+<button class="cell" type="button" data-r="4" data-c="7" data-letter="O">O</button>
+<button class="cell" type="button" data-r="4" data-c="8" data-letter="L">L</button>
+<button class="cell" type="button" data-r="5" data-c="0" data-letter="G">G</button>
+<button class="cell" type="button" data-r="5" data-c="1" data-letter="U">U</button>
+<button class="cell" type="button" data-r="5" data-c="2" data-letter="F">F</button>
+<button class="cell" type="button" data-r="5" data-c="3" data-letter="A">A</button>
+<button class="cell" type="button" data-r="5" data-c="4" data-letter="G">G</button>
+<button class="cell" type="button" data-r="5" data-c="5" data-letter="R">R</button>
+<button class="cell" type="button" data-r="5" data-c="6" data-letter="H">H</button>
+<button class="cell" type="button" data-r="5" data-c="7" data-letter="R">R</button>
+<button class="cell" type="button" data-r="5" data-c="8" data-letter="I">I</button>
+<button class="cell" type="button" data-r="6" data-c="0" data-letter="C">C</button>
+<button class="cell" type="button" data-r="6" data-c="1" data-letter="C">C</button>
+<button class="cell" type="button" data-r="6" data-c="2" data-letter="B">B</button>
+<button class="cell" type="button" data-r="6" data-c="3" data-letter="T">T</button>
+<button class="cell" type="button" data-r="6" data-c="4" data-letter="G">G</button>
+<button class="cell" type="button" data-r="6" data-c="5" data-letter="T">T</button>
+<button class="cell" type="button" data-r="6" data-c="6" data-letter="E">E</button>
+<button class="cell" type="button" data-r="6" data-c="7" data-letter="P">P</button>
+<button class="cell" type="button" data-r="6" data-c="8" data-letter="S">S</button>
+<button class="cell" type="button" data-r="7" data-c="0" data-letter="O">O</button>
+<button class="cell" type="button" data-r="7" data-c="1" data-letter="O">O</button>
+<button class="cell" type="button" data-r="7" data-c="2" data-letter="N">N</button>
+<button class="cell" type="button" data-r="7" data-c="3" data-letter="U">U</button>
+<button class="cell" type="button" data-r="7" data-c="4" data-letter="A">A</button>
+<button class="cell" type="button" data-r="7" data-c="5" data-letter="T">T</button>
+<button class="cell" type="button" data-r="7" data-c="6" data-letter="S">S</button>
+<button class="cell" type="button" data-r="7" data-c="7" data-letter="T">T</button>
+<button class="cell" type="button" data-r="7" data-c="8" data-letter="E">E</button>
+      </div>
+    </div>
+    <div class="status" id="status">Start anywhere.</div>
+    <div class="controls">
+      <button class="ctrl" id="clear" type="button">Clear</button>
+      <button class="ctrl" id="hint" type="button">Hint</button>
+    </div>
+    <div class="words" id="foundList"></div>
+  </section>
+  <section class="finish" id="finish">
+    <div class="small">Puzzle complete</div>
+    <h2>Today’s answer: MUEHLTALHOF.</h2>
+    <div class="bags">Pack your bags.</div>
+  </section>
+</main>
+<script>
+(function () {
+"use strict";
+const TARGETS=["MUEHLTALHOF", "GEBURTSTAG", "PETERSILIE", "ZWEITAGE", "COCONUT", "OKTOBER", "DINNER", "ABFLUG", "SPA"];
+const targets=new Set(TARGETS);
+const special="MUEHLTALHOF";
+const grid=document.getElementById("grid");
+const boardWrap=document.getElementById("boardWrap");
+const svg=document.getElementById("lines");
+const status=document.getElementById("status");
+const foundList=document.getElementById("foundList");
+const foundCount=document.getElementById("foundCount");
+let selected=[], found=new Set(), dragging=false, hintIndex=0;
+
+function cellAt(r,c){return grid.querySelector('[data-r="'+r+'"][data-c="'+c+'"]');}
+function adjacent(a,b){const dr=Math.abs(a.r-b.r),dc=Math.abs(a.c-b.c);return dr<=1&&dc<=1&&(dr+dc)>0;}
+function currentWord(){return selected.map(p=>p.letter).join("");}
+function normalizedTarget(word){if(targets.has(word))return word;const rev=word.split("").reverse().join("");return targets.has(rev)?rev:null;}
+function redrawLines(){
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+  if(selected.length<2)return;
+  const wrap=boardWrap.getBoundingClientRect();
+  for(let i=0;i<selected.length-1;i++){
+    const a=cellAt(selected[i].r,selected[i].c).getBoundingClientRect();
+    const b=cellAt(selected[i+1].r,selected[i+1].c).getBoundingClientRect();
+    const line=document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",a.left-wrap.left+a.width/2); line.setAttribute("y1",a.top-wrap.top+a.height/2);
+    line.setAttribute("x2",b.left-wrap.left+b.width/2); line.setAttribute("y2",b.top-wrap.top+b.height/2);
+    line.setAttribute("stroke","#98bfe8"); line.setAttribute("stroke-width","7"); line.setAttribute("stroke-linecap","round"); line.setAttribute("opacity",".72");
+    svg.appendChild(line);
+  }
+}
+function refreshSelection(){
+  grid.querySelectorAll(".cell").forEach(el=>el.classList.remove("selected"));
+  selected.forEach(p=>cellAt(p.r,p.c).classList.add("selected"));
+  redrawLines();
+}
+function checkWord(){
+  if(!selected.length)return;
+  const word=currentWord();
+  const hit=normalizedTarget(word);
+  if(!hit||found.has(hit))return;
+  found.add(hit);
+  selected.forEach(p=>cellAt(p.r,p.c).classList.add(hit===special?"special":"found"));
+  const pill=document.createElement("span");
+  pill.className="pill"+(hit===special?" special":"");
+  pill.textContent=hit;
+  foundList.appendChild(pill);
+  foundCount.textContent=found.size;
+  status.textContent=hit===special?"You found the special answer.":"Nice.";
+  selected=[]; refreshSelection();
+  if(found.size===TARGETS.length){
+    status.textContent="All words found.";
+    document.getElementById("finish").classList.add("show");
+    celebrate();
+  }
+}
+function addCell(el){
+  const p={r:Number(el.dataset.r),c:Number(el.dataset.c),letter:el.dataset.letter};
+  const idx=selected.findIndex(x=>x.r===p.r&&x.c===p.c);
+  if(idx===selected.length-2){selected.pop();refreshSelection();return;}
+  if(idx>=0)return;
+  if(!selected.length||adjacent(selected[selected.length-1],p)){
+    selected.push(p);refreshSelection();
+    const hit=normalizedTarget(currentWord());
+    if(hit&&!found.has(hit))checkWord();
+  }
+}
+function celebrate(){
+  const colors=["#f4cc72","#98d6ac","#b9d7f5","#e6b7c8","#c8b6e7"];
+  for(let i=0;i<55;i++){
+    const c=document.createElement("div");c.className="confetti";
+    c.style.left=(Math.random()*100)+"vw";c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDelay=(Math.random()*.6)+"s";document.body.appendChild(c);
+    window.setTimeout(()=>c.remove(),3400);
+  }
+}
+grid.addEventListener("pointerdown",function(e){
+  const el=e.target.closest(".cell");if(!el)return;e.preventDefault();dragging=true;
+  const p={r:Number(el.dataset.r),c:Number(el.dataset.c)};
+  if(selected.length&&!adjacent(selected[selected.length-1],p))selected=[];
+  addCell(el);
+});
+grid.addEventListener("pointermove",function(e){
+  if(!dragging)return;
+  const el=document.elementFromPoint(e.clientX,e.clientY);
+  if(el&&el.classList&&el.classList.contains("cell"))addCell(el);
+});
+window.addEventListener("pointerup",()=>{ dragging=false; checkWord(); });
+
+grid.addEventListener("click", function(e){
+  const el=e.target.closest(".cell");
+  if(!el)return;
+  const p={r:Number(el.dataset.r),c:Number(el.dataset.c)};
+  const alreadyLast=selected.length &&
+    selected[selected.length-1].r===p.r &&
+    selected[selected.length-1].c===p.c;
+  if(!alreadyLast){
+    if(selected.length&&!adjacent(selected[selected.length-1],p))selected=[];
+    addCell(el);
+  }
+  checkWord();
+});
+
+window.addEventListener("resize",redrawLines);
+document.getElementById("clear").addEventListener("click",function(){selected=[];refreshSelection();status.textContent="Selection cleared.";})
+document.getElementById("hint").addEventListener("click",function(){
+  const hints=["The title is not entirely accidental.","Some words describe what will happen over two days.","The special answer is the name of the place."];
+  status.textContent=hints[Math.min(hintIndex,hints.length-1)];hintIndex++;
+});
+})();
+</script>
+</body>
+</html>
