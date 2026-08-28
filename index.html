@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f8f6f0">
+<title>Birthday Strands</title>
+<style>
+:root {
+  --bg:#f8f6f0; --ink:#111; --muted:#6d6a64; --rule:#d9d5cc;
+  --card:#fffefb; --select:#b9d7f5; --word:#f4cc72; --special:#98d6ac;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+main{width:min(620px,100%);margin:auto;padding:18px 14px 48px}
+.topbar{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--rule);padding:4px 2px 15px;margin-bottom:20px}
+.brand{font:700 31px Georgia,serif;letter-spacing:-.03em}
+.game{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.theme-card{text-align:center;padding:4px 14px 18px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.theme{font:700 26px/1.15 Georgia,serif}
+.instructions{font-size:14px;line-height:1.45;color:var(--muted);margin:9px auto 0;max-width:460px}
+.board-card{background:var(--card);border:1px solid var(--rule);border-radius:20px;padding:14px;box-shadow:0 4px 18px rgba(0,0,0,.035)}
+.progress{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:1px 4px 12px}
+#grid{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;user-select:none}
+.cell{appearance:none;border:0;background:transparent;aspect-ratio:1;border-radius:50%;font-size:clamp(16px,5vw,23px);font-weight:800;display:grid;place-items:center;cursor:pointer;transition:.14s}
+.cell.selected{background:var(--select);transform:scale(.95)}
+.cell.found{background:var(--word)}
+.cell.special{background:var(--special)}
+.status{min-height:42px;text-align:center;padding:13px 6px 0;font-size:14px;color:var(--muted);line-height:1.4}
+.controls{display:flex;justify-content:center;gap:9px;margin-top:3px}
+.ctrl{border:1px solid var(--rule);background:transparent;border-radius:999px;padding:9px 13px;font-weight:700;font-size:13px;cursor:pointer}
+.words{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:13px}
+.pill{font-size:11px;font-weight:800;background:#ece8df;padding:6px 9px;border-radius:999px}
+.pill.special{background:var(--special)}
+.finish{display:none;text-align:center;margin-top:20px;padding:28px 18px 25px;border-top:1px solid var(--rule)}
+.finish.show{display:block}
+.finish .small{font-size:12px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.finish h2{font:700 34px/1.1 Georgia,serif;margin:10px 0 4px}
+.finish .bags{font:italic 25px Georgia,serif;margin-top:11px}
+@media(max-width:380px){main{padding-left:8px;padding-right:8px}.board-card{padding:10px}#grid{gap:3px}.brand{font-size:28px}.theme{font-size:23px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar"><div class="brand">Strands</div><div class="game">Birthday Games</div></div>
+  <section class="theme-card">
+    <div class="eyebrow">Today’s Theme</div>
+    <div class="theme">Please put the lime in the coconut</div>
+    <div class="instructions">Tap adjacent letters one by one. Tap the previous letter to go back. A correct word is recognised automatically.</div>
+  </section>
+
+  <section class="board-card">
+    <div class="progress"><span>Words found</span><strong><span id="foundCount">0</span>/9</strong></div>
+    <div id="grid">
+<button class="cell" type="button" data-r="0" data-c="0" data-letter="G">G</button>
+<button class="cell" type="button" data-r="0" data-c="1" data-letter="R">R</button>
+<button class="cell" type="button" data-r="0" data-c="2" data-letter="T">T</button>
+<button class="cell" type="button" data-r="0" data-c="3" data-letter="S">S</button>
+<button class="cell" type="button" data-r="0" data-c="4" data-letter="P">P</button>
+<button class="cell" type="button" data-r="0" data-c="5" data-letter="R">R</button>
+<button class="cell" type="button" data-r="0" data-c="6" data-letter="S">S</button>
+<button class="cell" type="button" data-r="0" data-c="7" data-letter="Z">Z</button>
+<button class="cell" type="button" data-r="0" data-c="8" data-letter="W">W</button>
+<button class="cell" type="button" data-r="1" data-c="0" data-letter="E">E</button>
+<button class="cell" type="button" data-r="1" data-c="1" data-letter="U">U</button>
+<button class="cell" type="button" data-r="1" data-c="2" data-letter="T">T</button>
+<button class="cell" type="button" data-r="1" data-c="3" data-letter="E">E</button>
+<button class="cell" type="button" data-r="1" data-c="4" data-letter="E">E</button>
+<button class="cell" type="button" data-r="1" data-c="5" data-letter="I">I</button>
+<button class="cell" type="button" data-r="1" data-c="6" data-letter="A">A</button>
+<button class="cell" type="button" data-r="1" data-c="7" data-letter="T">T</button>
+<button class="cell" type="button" data-r="1" data-c="8" data-letter="E">E</button>
+<button class="cell" type="button" data-r="2" data-c="0" data-letter="B">B</button>
+<button class="cell" type="button" data-r="2" data-c="1" data-letter="U">U</button>
+<button class="cell" type="button" data-r="2" data-c="2" data-letter="A">A</button>
+<button class="cell" type="button" data-r="2" data-c="3" data-letter="T">T</button>
+<button class="cell" type="button" data-r="2" data-c="4" data-letter="L">L</button>
+<button class="cell" type="button" data-r="2" data-c="5" data-letter="T">T</button>
+<button class="cell" type="button" data-r="2" data-c="6" data-letter="E">E</button>
+<button class="cell" type="button" data-r="2" data-c="7" data-letter="G">G</button>
+<button class="cell" type="button" data-r="2" data-c="8" data-letter="I">I</button>
+<button class="cell" type="button" data-r="3" data-c="0" data-letter="M">M</button>
+<button class="cell" type="button" data-r="3" data-c="1" data-letter="G">G</button>
+<button class="cell" type="button" data-r="3" data-c="2" data-letter="E">E</button>
+<button class="cell" type="button" data-r="3" data-c="3" data-letter="I">I</button>
+<button class="cell" type="button" data-r="3" data-c="4" data-letter="L">L</button>
+<button class="cell" type="button" data-r="3" data-c="5" data-letter="C">C</button>
+<button class="cell" type="button" data-r="3" data-c="6" data-letter="A">A</button>
+<button class="cell" type="button" data-r="3" data-c="7" data-letter="T">T</button>
+<button class="cell" type="button" data-r="3" data-c="8" data-letter="F">F</button>
+<button class="cell" type="button" data-r="4" data-c="0" data-letter="O">O</button>
+<button class="cell" type="button" data-r="4" data-c="1" data-letter="K">K</button>
+<button class="cell" type="button" data-r="4" data-c="2" data-letter="E">E</button>
+<button class="cell" type="button" data-r="4" data-c="3" data-letter="H">H</button>
+<button class="cell" type="button" data-r="4" data-c="4" data-letter="O">O</button>
+<button class="cell" type="button" data-r="4" data-c="5" data-letter="L">L</button>
+<button class="cell" type="button" data-r="4" data-c="6" data-letter="U">U</button>
+<button class="cell" type="button" data-r="4" data-c="7" data-letter="O">O</button>
+<button class="cell" type="button" data-r="4" data-c="8" data-letter="D">D</button>
+<button class="cell" type="button" data-r="5" data-c="0" data-letter="T">T</button>
+<button class="cell" type="button" data-r="5" data-c="1" data-letter="O">O</button>
+<button class="cell" type="button" data-r="5" data-c="2" data-letter="B">B</button>
+<button class="cell" type="button" data-r="5" data-c="3" data-letter="C">C</button>
+<button class="cell" type="button" data-r="5" data-c="4" data-letter="O">O</button>
+<button class="cell" type="button" data-r="5" data-c="5" data-letter="N">N</button>
+<button class="cell" type="button" data-r="5" data-c="6" data-letter="H">H</button>
+<button class="cell" type="button" data-r="5" data-c="7" data-letter="N">N</button>
+<button class="cell" type="button" data-r="5" data-c="8" data-letter="I">I</button>
+<button class="cell" type="button" data-r="6" data-c="0" data-letter="R">R</button>
+<button class="cell" type="button" data-r="6" data-c="1" data-letter="E">E</button>
+<button class="cell" type="button" data-r="6" data-c="2" data-letter="A">A</button>
+<button class="cell" type="button" data-r="6" data-c="3" data-letter="L">L</button>
+<button class="cell" type="button" data-r="6" data-c="4" data-letter="G">G</button>
+<button class="cell" type="button" data-r="6" data-c="5" data-letter="S">S</button>
+<button class="cell" type="button" data-r="6" data-c="6" data-letter="L">L</button>
+<button class="cell" type="button" data-r="6" data-c="7" data-letter="R">R</button>
+<button class="cell" type="button" data-r="6" data-c="8" data-letter="N">N</button>
+<button class="cell" type="button" data-r="7" data-c="0" data-letter="O">O</button>
+<button class="cell" type="button" data-r="7" data-c="1" data-letter="B">B</button>
+<button class="cell" type="button" data-r="7" data-c="2" data-letter="F">F</button>
+<button class="cell" type="button" data-r="7" data-c="3" data-letter="U">U</button>
+<button class="cell" type="button" data-r="7" data-c="4" data-letter="P">P</button>
+<button class="cell" type="button" data-r="7" data-c="5" data-letter="A">A</button>
+<button class="cell" type="button" data-r="7" data-c="6" data-letter="V">V</button>
+<button class="cell" type="button" data-r="7" data-c="7" data-letter="E">E</button>
+<button class="cell" type="button" data-r="7" data-c="8" data-letter="E">E</button>
+    </div>
+    <div class="status" id="status">Start anywhere.</div>
+    <div class="controls">
+      <button class="ctrl" id="clear" type="button">Clear</button>
+      <button class="ctrl" id="hint" type="button">Hint</button>
+    </div>
+    <div class="words" id="foundList"></div>
+  </section>
+
+  <section class="finish" id="finish">
+    <div class="small">Puzzle complete</div>
+    <h2>Today’s answer: MUEHLTALHOF.</h2>
+    <div class="bags">Pack your bags.</div>
+  </section>
+</main>
+
+<script>
+(function(){
+  const TARGETS = ["MUEHLTALHOF", "GEBURTSTAG", "PETERSILIE", "ZWEITAGE", "COCONUT", "OKTOBER", "DINNER", "ABFLUG", "SPA"];
+  const targetSet = new Set(TARGETS);
+  const special = "MUEHLTALHOF";
+  const grid = document.getElementById("grid");
+  const status = document.getElementById("status");
+  const foundCount = document.getElementById("foundCount");
+  const foundList = document.getElementById("foundList");
+  let selected = [];
+  const found = new Set();
+  let hintIndex = 0;
+
+  function adjacent(a,b){
+    const dr=Math.abs(a.r-b.r), dc=Math.abs(a.c-b.c);
+    return dr<=1 && dc<=1 && (dr+dc)>0;
+  }
+
+  function word(){
+    return selected.map(x=>x.letter).join("");
+  }
+
+  function hitFor(w){
+    if(targetSet.has(w)) return w;
+    const rev=w.split("").reverse().join("");
+    return targetSet.has(rev) ? rev : null;
+  }
+
+  function repaint(){
+    grid.querySelectorAll(".cell").forEach(el=>el.classList.remove("selected"));
+    selected.forEach(p=>p.el.classList.add("selected"));
+  }
+
+  function complete(hit){
+    found.add(hit);
+    selected.forEach(p=>p.el.classList.add(hit===special ? "special" : "found"));
+
+    const pill=document.createElement("span");
+    pill.className="pill"+(hit===special ? " special" : "");
+    pill.textContent=hit;
+    foundList.appendChild(pill);
+
+    foundCount.textContent=found.size;
+    status.textContent=hit===special ? "You found the special answer." : "Nice.";
+    selected=[];
+    repaint();
+
+    if(found.size===TARGETS.length){
+      status.textContent="All words found.";
+      document.getElementById("finish").classList.add("show");
+    }
+  }
+
+  grid.addEventListener("click", function(e){
+    const el=e.target.closest(".cell");
+    if(!el || found.has(el.dataset.word)) return;
+
+    const p={r:Number(el.dataset.r), c:Number(el.dataset.c), letter:el.dataset.letter, el};
+
+    if(selected.length){
+      const last=selected[selected.length-1];
+      if(last.r===p.r && last.c===p.c) return;
+
+      if(selected.length>=2){
+        const prev=selected[selected.length-2];
+        if(prev.r===p.r && prev.c===p.c){
+          selected.pop();
+          repaint();
+          return;
+        }
+      }
+
+      if(!adjacent(last,p)){
+        selected=[p];
+        repaint();
+        status.textContent="Started a new path.";
+        return;
+      }
+
+      if(selected.some(x=>x.r===p.r && x.c===p.c)) return;
+    }
+
+    selected.push(p);
+    repaint();
+
+    const hit=hitFor(word());
+    if(hit && !found.has(hit)) complete(hit);
+  });
+
+  document.getElementById("clear").addEventListener("click", function(){
+    selected=[];
+    repaint();
+    status.textContent="Selection cleared.";
+  });
+
+  document.getElementById("hint").addEventListener("click", function(){
+    const hints=[
+      "The title is not entirely accidental.",
+      "Some words describe what will happen over two days.",
+      "The special answer is the name of the place."
+    ];
+    status.textContent=hints[Math.min(hintIndex,hints.length-1)];
+    hintIndex++;
+  });
+})();
+</script>
+</body>
+</html>
